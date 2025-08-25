@@ -2,6 +2,8 @@ package health
 
 import (
 	"database/sql"
+	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -21,6 +23,12 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 }
 
 func (h *Handler) handleHealthz(w http.ResponseWriter, r *http.Request) {
+	err := h.db.Ping()
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("error connecting the db %w", err))
+		log.Fatal(err)
+		return
+	}
 	utils.WriteJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 
 }

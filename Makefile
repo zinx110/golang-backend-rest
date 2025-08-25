@@ -8,3 +8,6 @@ test:
 
 run: build
 	@./bin/goBackendRest 
+
+dev:
+	@go run cmd/main.go
