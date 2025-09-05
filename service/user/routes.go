@@ -1,13 +1,13 @@
 package user
 
 import (
-	"database/sql"
-	"errors"
 	"fmt"
 	"net/http"
 	"time"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
+	"github.com/zinx110/golang-backend-rest/service/auth"
 	"github.com/zinx110/golang-backend-rest/types"
 	"github.com/zinx110/golang-backend-rest/utils"
 )
@@ -37,21 +37,32 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
+
+	// validate payload
+	if err := utils.Validate.Struct(payload); err != nil {
+		errors := err.(validator.ValidationErrors)
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", errors))
+		return
+	}
+
+	// check if user exists
 	_, err := h.store.GetUserByEmail(payload.Email)
 	if err == nil {
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("user with email %s already exists", payload.Email))
 		return
 	}
-	if !errors.Is(err, sql.ErrNoRows) {
+
+	// hash password
+	hashedPassword, err := auth.HashPassword(payload.Password)
+	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, err)
-		return
 	}
 	// check if user exists
 	err = h.store.CreateUser(types.User{
 		FirstName: payload.FirstName,
 		LastName:  payload.LastName,
 		Email:     payload.Email,
-		Password:  payload.Password,
+		Password:  hashedPassword,
 		CreatedAt: time.Now().UTC(),
 	})
 	if err != nil {
