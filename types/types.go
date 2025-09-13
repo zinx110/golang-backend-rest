@@ -3,10 +3,15 @@ package types
 import "time"
 
 type RegisterUserPayload struct {
-	FirstName string `jsn:"firstName" validate:"required"`
+	FirstName string `json:"firstName" validate:"required"`
 	LastName  string `json:"lastName" validate:"required"`
 	Email     string `json:"email" validate:"required,email"`
 	Password  string `json:"password" validate:"required,min=3,max=130"`
+}
+
+type LoginUserPayload struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required"`
 }
 
 type User struct {
