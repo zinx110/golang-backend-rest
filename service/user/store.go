@@ -3,7 +3,6 @@ package user
 import (
 	"database/sql"
 	"fmt"
-	"log"
 
 	"github.com/zinx110/golang-backend-rest/types"
 )
@@ -13,12 +12,7 @@ type Store struct {
 }
 
 func NewStore(db *sql.DB) *Store {
-
-	newStore := &Store{db: db}
-	if err := createUserTableIfNotExists(newStore); err != nil {
-		log.Fatal("failed to create user table:", err)
-	}
-	return newStore
+	return &Store{db: db}
 }
 
 func (s *Store) Close() error {
