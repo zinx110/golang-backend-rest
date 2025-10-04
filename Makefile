@@ -1,3 +1,4 @@
+SHELL := bash
 
 setup: 
 	@go mod tidy

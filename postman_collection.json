@@ -1,0 +1,173 @@
+{
+	"info": {
+		"name": "Go Backend REST API",
+		"description": "Complete API collection for testing the Go backend CRUD application",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/healthz",
+					"host": ["{{base_url}}"],
+					"path": ["healthz"]
+				},
+				"description": "Check if the API and database are healthy"
+			},
+			"response": []
+		},
+		{
+			"name": "User Registration",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// No token saved on registration, user needs to login"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"password123\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/register",
+					"host": ["{{base_url}}"],
+					"path": ["register"]
+				},
+				"description": "Register a new user. Password must be at least 3 characters."
+			},
+			"response": []
+		},
+		{
+			"name": "User Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"if (jsonData.token) {",
+							"    pm.collectionVariables.set(\"jwt_token\", jsonData.token);",
+							"    console.log(\"JWT Token saved: \" + jsonData.token);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"password123\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/login",
+					"host": ["{{base_url}}"],
+					"path": ["login"]
+				},
+				"description": "Login with email and password. Returns JWT token that is automatically saved to collection variable."
+			},
+			"response": []
+		},
+		{
+			"name": "Create Product",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Laptop\",\n    \"description\": \"High-performance gaming laptop\",\n    \"image\": \"https://example.com/laptop.jpg\",\n    \"price\": 1299.99,\n    \"quantity\": 10\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/products",
+					"host": ["{{base_url}}"],
+					"path": ["products"]
+				},
+				"description": "Create a new product. Image must be a valid URL. Price must be greater than 0. Quantity must be >= 0."
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Products",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/products",
+					"host": ["{{base_url}}"],
+					"path": ["products"]
+				},
+				"description": "Get list of all products"
+			},
+			"response": []
+		},
+		{
+			"name": "Cart Checkout",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt_token}}",
+						"description": "JWT token from login"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"items\": [\n        {\n            \"productID\": 1,\n            \"quantity\": 2\n        },\n        {\n            \"productID\": 2,\n            \"quantity\": 1\n        }\n    ]\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/cart/checkout",
+					"host": ["{{base_url}}"],
+					"path": ["cart", "checkout"]
+				},
+				"description": "Checkout cart with items. Requires JWT authentication. Make sure to login first and create products before testing this."
+			},
+			"response": []
+		}
+	]
+}
+

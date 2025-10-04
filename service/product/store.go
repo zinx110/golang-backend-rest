@@ -17,7 +17,7 @@ func NewStore(db *sql.DB) *Store {
 }
 
 func (s *Store) GetAllProducts() ([]types.Product, error) {
-	rows, err := s.db.Query("SELECT id FROM products")
+	rows, err := s.db.Query("SELECT * FROM products")
 	if err != nil {
 		return nil, err
 	}
@@ -108,8 +108,8 @@ func scanRowIntoProduct(row *sql.Rows) (*types.Product, error) {
 		&product.Description,
 		&product.Image,
 		&product.Price,
-		&product.Quantity,
 		&product.CreatedAt,
+		&product.Quantity,
 	)
 	if err != nil {
 		return nil, err

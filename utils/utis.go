@@ -16,7 +16,7 @@ func ParseJSON(r *http.Request, payload any) error {
 }
 
 func WriteJSON(w http.ResponseWriter, status int, v any) error {
-	w.Header().Add("COntent-Type", "application/json")
+	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(status)
 	return json.NewEncoder(w).Encode(v)
 }
